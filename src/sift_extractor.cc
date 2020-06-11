@@ -62,6 +62,18 @@ void ExtractAllFilePathsInDirectory(const std::string& dir_path,
   LOG(INFO) << "Count of found files : " << filenames.size();
 }
 
+std::filesystem::path CreateSavingDirectory(const std::string& src_filepath) {
+  const std::filesystem::path rep_path(src_filepath);
+  const std::filesystem::path parent_dir = rep_path.parent_path().replace_filename("sift");
+  std::filesystem::create_directories(parent_dir);
+  return parent_dir;
+}
+
+std::filesystem::path CreateFileName(const std::string& src_filepath) {
+  std::filesystem::path org_path(src_filepath);
+  return org_path.replace_extension(".bin").filename();
+}
+
 void ComputeSiftFeatures(const std::vector<std::string>& filepaths) {
   SIFTParams params(FLAGS_kMaxScaledDim, FLAGS_kNumSiftDimensions, FLAGS_num_octaves,
                     FLAGS_num_levels, FLAGS_def_first_octave, FLAGS_peak_threshold,
@@ -69,9 +81,7 @@ void ComputeSiftFeatures(const std::vector<std::string>& filepaths) {
                     FLAGS_root_sift, FLAGS_upright_sift);
 
   // X. Create saving directory.
-  const std::filesystem::path rep_path(filepaths[0]);
-  const std::filesystem::path parent_dir = rep_path.parent_path().replace_filename("sift");
-  std::filesystem::create_directories(parent_dir);
+  const std::filesystem::path dir_path(CreateSavingDirectory(filepaths[0]));
 
   int size = filepaths.size();
   for (int idx = 0; idx < size; idx++) {
@@ -90,10 +100,8 @@ void ComputeSiftFeatures(const std::vector<std::string>& filepaths) {
     }
 
     {
-      std::filesystem::path bin_dir(parent_dir);
-      std::filesystem::path org_path(image_path);
-      std::string bin_path = bin_dir.append(org_path.replace_extension(".bin").filename().string());
-
+      std::string bin_path =
+          std::filesystem::path(dir_path).append(CreateFileName(image_path).string());
       LOG(INFO) << "Saving binary to : " << bin_path;
       std::ofstream feature_writer(bin_path, std::ios::out | std::ios::binary);
       cereal::PortableBinaryOutputArchive output_archive(feature_writer);
