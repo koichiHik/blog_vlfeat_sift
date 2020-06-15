@@ -1,6 +1,6 @@
 
 ## Sample Image Path
---data_directory=/home/koichi/Desktop/SFM_Picture/images.Gendarmenmarkt/home/wilsonkl/projects/SfM_Init/dataset_images/Gendarmenmarkt/images
+--data_directory=/home/koichi/Desktop/SFM_Picture/Gendarmenmarkt_octave0/images
 
 ## Const Parameters
 --kMaxScaledDim=3600
@@ -9,8 +9,9 @@
 ## Sift Parameters
 --num_octaves=-1
 --num_levels=3
---def_first_octave=-1
---max_num_feature=10000
+#--def_first_octave=-1
+--def_first_octave=0
+--max_num_feature=50000
 
 --peak_threshold=1.2
 --edge_threshold=10.0
