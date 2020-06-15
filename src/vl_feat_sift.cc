@@ -39,9 +39,9 @@ void ComputeKeyPointsAndDescriptors(const cv::Mat& gray_image, const SIFTParams&
                                         params.num_levels_, first_octave);
 
   // 3. Set Parameters.
-  vl_sift_set_peak_thresh(sift_filter, params.peak_threshold_ / 255.0);
-  vl_sift_set_edge_thresh(sift_filter, params.edge_threshold_ / 255.0);
-  vl_sift_set_norm_thresh(sift_filter, params.norm_threshold_ / 255.0);
+  vl_sift_set_peak_thresh(sift_filter, params.peak_threshold_);
+  vl_sift_set_edge_thresh(sift_filter, params.edge_threshold_);
+  vl_sift_set_norm_thresh(sift_filter, params.norm_threshold_);
   vl_sift_set_magnif(sift_filter, params.magnif_);
   vl_sift_set_window_size(sift_filter, params.window_size_);
 
@@ -59,20 +59,14 @@ void ComputeKeyPointsAndDescriptors(const cv::Mat& gray_image, const SIFTParams&
     const VlSiftKeypoint* vl_keypoints = vl_sift_get_keypoints(sift_filter);
     const int num_keypoints = vl_sift_get_nkeypoints(sift_filter);
 
-    /*
-    LOG(INFO) << "Processing Octave : " << octave_no;
-    LOG(INFO) << "Octave Width : " << vl_sift_get_octave_width(sift_filter);
-    LOG(INFO) << "Octave Height : " << vl_sift_get_octave_height(sift_filter);
-    LOG(INFO) << "Num Keypoints : " << num_keypoints;
-    */
-
-    // Calc Orientation for keypoints detected.
+    // Compute descriptors for all keypoints detected.
     for (int i = 0; i < num_keypoints; ++i) {
-      // Calculate orientations of the keypoint.
+
+      // Compute orientations.
       double angles[4];
       int num_angles = vl_sift_calc_keypoint_orientations(sift_filter, angles, &vl_keypoints[i]);
 
-      // Compute for Each Key Point.
+      // Compute descriptor for all keypoints and orientations.
       Eigen::VectorXf descriptor(params.num_sift_dimensions_);
       for (int j = 0; j < num_angles; ++j) {
         descriptor.setZero();
@@ -84,9 +78,12 @@ void ComputeKeyPointsAndDescriptors(const cv::Mat& gray_image, const SIFTParams&
         keypoints.push_back(kp);
       }
     }
+
+    // Proceed to next octave.
     vl_status = vl_sift_process_next_octave(sift_filter);
     octave_no = octave_no + 1;
   }
 
+  // X. Delete sift caculator.
   vl_sift_delete(sift_filter);
 }

@@ -1,6 +1,7 @@
 
 ## Sample Image Path
 #--data_directory=/home/koichi/Desktop/SFM_Picture/Gendarmenmarkt_octave0/images
+--data_directory=./data/images
 
 ## Const Parameters
 --kMaxScaledDim=3600
