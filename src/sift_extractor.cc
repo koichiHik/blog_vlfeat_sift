@@ -117,7 +117,7 @@ int main(int argc, char** argv) {
   FLAGS_stderrthreshold = google::GLOG_INFO;
   google::InitGoogleLogging(argv[0]);
   const std::string dir_path =
-      FLAGS_data_directory.empty() ? project_folder_path + "/data" : FLAGS_data_directory;
+      FLAGS_data_directory.empty() ? project_folder_path + "/data/images" : FLAGS_data_directory;
 
   // X. Extract all file names.
   std::vector<std::string> filenames;
