@@ -80,9 +80,12 @@ void ComputeSiftFeatures(const std::vector<std::string>& filepaths) {
                     FLAGS_edge_threshold, FLAGS_norm_threshold, FLAGS_magnif, FLAGS_window_size,
                     FLAGS_root_sift, FLAGS_upright_sift);
 
+  CHECK(filepaths.size() > 0);
+
   // X. Create saving directory.
   const std::filesystem::path dir_path(CreateSavingDirectory(filepaths[0]));
 
+  // X. Compute SIFT and save.
   int size = filepaths.size();
   for (int idx = 0; idx < size; idx++) {
     const std::string image_path = filepaths[idx];
@@ -90,6 +93,7 @@ void ComputeSiftFeatures(const std::vector<std::string>& filepaths) {
     std::vector<Eigen::VectorXf> descriptors;
     cv::Mat gray_image = cv::imread(image_path, cv::IMREAD_GRAYSCALE);
 
+    // X. Compute SIFT keypoints and descriptors.
     LOG(INFO) << "Compute SIFT features.... Current status : " << idx << " / " << size;
     ComputeKeyPointsAndDescriptors(gray_image, params, keypoints, descriptors);
     LOG(INFO) << "SIFT features computed! Key Point Count : " << keypoints.size();
@@ -99,6 +103,7 @@ void ComputeSiftFeatures(const std::vector<std::string>& filepaths) {
       descriptors.resize(FLAGS_max_num_feature);
     }
 
+    // X. Serialize data and save.
     {
       std::string bin_path =
           std::filesystem::path(dir_path).append(CreateFileName(image_path).string());
@@ -118,6 +123,9 @@ int main(int argc, char** argv) {
   google::InitGoogleLogging(argv[0]);
   const std::string dir_path =
       FLAGS_data_directory.empty() ? project_folder_path + "/data/images" : FLAGS_data_directory;
+
+  // X. Show data directory.
+  LOG(INFO) << "Directory path to be searched : " << dir_path;
 
   // X. Extract all file names.
   std::vector<std::string> filenames;
